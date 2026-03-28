@@ -24,6 +24,8 @@ export class App {
   private readonly destroyRef = inject(DestroyRef);
   private readonly pendingTimers: number[] = [];
   private readonly pendingIntervals: number[] = [];
+  private audioContext: AudioContext | null = null;
+  private audioTickerId: number | null = null;
   private readonly mainValues = signal<[number | null, number | null]>([null, null]);
   private readonly bonusValue = signal<number | null>(null);
   private readonly spinStates = signal<SpinStates>({
@@ -54,7 +56,10 @@ export class App {
   });
 
   constructor() {
-    this.destroyRef.onDestroy(() => this.clearPendingWork());
+    this.destroyRef.onDestroy(() => {
+      this.clearPendingWork();
+      void this.audioContext?.close();
+    });
   }
 
   protected drawNumbers(): void {
@@ -80,6 +85,7 @@ export class App {
       main2: false,
       bonus: false
     });
+    void this.startSpinSound();
 
     this.startSpin('main1', 3000, first, (value) => {
       this.mainValues.update(([, currentSecond]) => [value, currentSecond]);
@@ -98,6 +104,7 @@ export class App {
     });
 
     this.scheduleReveal(9000, () => {
+      this.stopSpinSound();
       this.isDrawing.set(false);
     });
   }
@@ -145,6 +152,78 @@ export class App {
     });
   }
 
+  private async startSpinSound(): Promise<void> {
+    const context = this.getAudioContext();
+
+    if (!context) {
+      return;
+    }
+
+    if (context.state === 'suspended') {
+      await context.resume();
+    }
+
+    this.stopSpinSound();
+    this.audioTickerId = window.setInterval(() => {
+      this.playSpinTick(context);
+    }, 85);
+  }
+
+  private stopSpinSound(): void {
+    if (this.audioTickerId !== null) {
+      window.clearInterval(this.audioTickerId);
+      this.audioTickerId = null;
+    }
+  }
+
+  private playSpinTick(context: AudioContext): void {
+    if (context.state !== 'running') {
+      return;
+    }
+
+    const now = context.currentTime;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const filter = context.createBiquadFilter();
+
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(900 + Math.random() * 500, now);
+
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1400 + Math.random() * 900, now);
+    filter.Q.setValueAtTime(2.5, now);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.026 + Math.random() * 0.012, now + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+
+    oscillator.connect(filter);
+    filter.connect(gain);
+    gain.connect(context.destination);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.06);
+  }
+
+  private getAudioContext(): AudioContext | null {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    if (this.audioContext) {
+      return this.audioContext;
+    }
+
+    const AudioContextCtor = window.AudioContext;
+
+    if (!AudioContextCtor) {
+      return null;
+    }
+
+    this.audioContext = new AudioContextCtor();
+    return this.audioContext;
+  }
+
   private clearPendingWork(): void {
     for (const timerId of this.pendingTimers) {
       window.clearTimeout(timerId);
@@ -156,6 +235,7 @@ export class App {
 
     this.pendingTimers.length = 0;
     this.pendingIntervals.length = 0;
+    this.stopSpinSound();
     this.isDrawing.set(false);
   }
 
