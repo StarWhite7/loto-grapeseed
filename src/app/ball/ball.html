@@ -1,14 +1,18 @@
 <article
   class="ticket-slot"
   [class.ticket-slot--bonus]="variant() === 'bonus'"
+  [class.ticket-slot--spinning]="spinning()"
 >
   <p class="ticket-slot__label">{{ label() }}</p>
   <div
     class="ticket-slot__token"
     [class.ticket-slot__token--bonus]="variant() === 'bonus'"
-    [style.animation-delay.ms]="delay()"
+    [class.ticket-slot__token--spinning]="spinning()"
   >
     <span class="ticket-slot__ring"></span>
-    <span class="ticket-slot__value">{{ value() ?? '?' }}</span>
+    <span class="ticket-slot__shine"></span>
+    <span class="ticket-slot__window">
+      <span class="ticket-slot__value">{{ value() ?? '?' }}</span>
+    </span>
   </div>
 </article>

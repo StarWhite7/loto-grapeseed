@@ -63,3 +63,10 @@ select {
   outline: 3px solid rgba(210, 159, 49, 0.55);
   outline-offset: 4px;
 }
+
+.ticket__button:disabled {
+  cursor: wait;
+  opacity: 0.78;
+  transform: none;
+  filter: saturate(0.85);
+}

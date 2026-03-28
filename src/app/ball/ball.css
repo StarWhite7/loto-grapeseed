@@ -8,6 +8,10 @@
   justify-items: center;
 }
 
+.ticket-slot--spinning .ticket-slot__label {
+  color: rgba(57, 39, 22, 0.96);
+}
+
 .ticket-slot__label {
   margin: 0;
   font-size: 0.84rem;
@@ -39,7 +43,11 @@
     inset 0 10px 18px rgba(255, 255, 255, 0.16),
     inset 0 -16px 20px rgba(34, 24, 12, 0.28),
     0 18px 30px rgba(40, 25, 10, 0.18);
-  animation: token-pop 520ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  overflow: hidden;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease;
 }
 
 .ticket-slot__token--bonus {
@@ -57,6 +65,19 @@
     linear-gradient(145deg, #d9a32f, #b8761f 50%, #8b4e0f);
 }
 
+.ticket-slot__token--spinning {
+  filter: saturate(1.16) brightness(1.02);
+  box-shadow:
+    inset 0 0 0 3px rgba(248, 223, 156, 0.38),
+    inset 0 10px 18px rgba(255, 255, 255, 0.18),
+    inset 0 -16px 20px rgba(34, 24, 12, 0.32),
+    0 0 0 6px rgba(248, 223, 156, 0.14),
+    0 22px 34px rgba(40, 25, 10, 0.24);
+  animation:
+    token-jitter 150ms linear infinite,
+    token-glow 600ms ease-in-out infinite alternate;
+}
+
 .ticket-slot__ring {
   position: absolute;
   inset: 12%;
@@ -65,9 +86,35 @@
   pointer-events: none;
 }
 
-.ticket-slot__value {
+.ticket-slot__shine {
+  position: absolute;
+  inset: -24%;
+  background: linear-gradient(
+    120deg,
+    transparent 24%,
+    rgba(255, 252, 234, 0.08) 40%,
+    rgba(255, 252, 234, 0.48) 50%,
+    rgba(255, 252, 234, 0.08) 60%,
+    transparent 76%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ticket-slot__token--spinning .ticket-slot__shine {
+  opacity: 1;
+  animation: shine-sweep 720ms linear infinite;
+}
+
+.ticket-slot__window {
   position: relative;
   z-index: 1;
+  display: grid;
+  place-items: center;
+  min-width: 3ch;
+}
+
+.ticket-slot__value {
   font-family: Rockwell, Georgia, 'Times New Roman', serif;
   font-size: clamp(2rem, 5vw, 3.4rem);
   font-weight: 800;
@@ -77,24 +124,69 @@
   text-shadow:
     0 2px 0 rgba(62, 40, 20, 0.55),
     0 10px 20px rgba(33, 19, 8, 0.22);
+  transition:
+    transform 120ms ease,
+    filter 120ms ease,
+    opacity 120ms ease;
 }
 
-@keyframes token-pop {
+.ticket-slot__token--spinning .ticket-slot__value {
+  animation: reel-flutter 110ms linear infinite;
+}
+
+@keyframes token-jitter {
   0% {
-    opacity: 0;
-    transform: translateY(16px) scale(0.72);
-    filter: saturate(0.8);
+    transform: translateY(0) scale(1);
   }
 
-  65% {
-    opacity: 1;
-    transform: translateY(-4px) scale(1.04);
+  25% {
+    transform: translateY(-1px) scale(1.01);
+  }
+
+  50% {
+    transform: translateY(1px) scale(0.995);
+  }
+
+  75% {
+    transform: translateY(-1px) scale(1.01);
   }
 
   100% {
-    opacity: 1;
     transform: translateY(0) scale(1);
-    filter: saturate(1);
+  }
+}
+
+@keyframes token-glow {
+  from {
+    filter: saturate(1.1) brightness(0.98);
+  }
+
+  to {
+    filter: saturate(1.22) brightness(1.06);
+  }
+}
+
+@keyframes reel-flutter {
+  0% {
+    transform: translateY(-20%) scaleY(1.18);
+    filter: blur(1px);
+    opacity: 0.82;
+  }
+
+  100% {
+    transform: translateY(20%) scaleY(0.84);
+    filter: blur(0.2px);
+    opacity: 1;
+  }
+}
+
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-52%) rotate(8deg);
+  }
+
+  100% {
+    transform: translateX(52%) rotate(8deg);
   }
 }
 

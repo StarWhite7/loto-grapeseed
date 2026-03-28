@@ -16,11 +16,11 @@
       </div>
 
       <div class="ticket__main-grid">
-        @for (ball of mainBalls(); track ball.id) {
+        @for (ball of mainBalls(); track ball.label) {
           <app-ball
             [label]="ball.label"
             [value]="ball.value"
-            [delay]="ball.delay"
+            [spinning]="ball.spinning"
           />
         }
       </div>
@@ -36,11 +36,11 @@
       </div>
 
       <div class="ticket__bonus-wrap">
-        @for (ball of [bonusBall()]; track ball.id) {
+        @for (ball of [bonusBall()]; track ball.label) {
           <app-ball
             [label]="ball.label"
             [value]="ball.value"
-            [delay]="ball.delay"
+            [spinning]="ball.spinning"
             variant="bonus"
           />
         }
@@ -48,8 +48,13 @@
     </section>
 
     <footer class="ticket__footer">
-      <button class="ticket__button" type="button" (click)="drawNumbers()">
-        Tirer les numeros
+      <button
+        class="ticket__button"
+        type="button"
+        [disabled]="isDrawing()"
+        (click)="drawNumbers()"
+      >
+        {{ isDrawing() ? 'Les rouleaux tournent...' : 'Tirer les numeros' }}
       </button>
       <p class="ticket__note">2 numeros principaux uniques, 1 numero chance distinct.</p>
     </footer>

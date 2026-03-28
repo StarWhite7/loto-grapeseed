@@ -9,6 +9,6 @@ import { Component, input } from '@angular/core';
 export class BallComponent {
   readonly label = input.required<string>();
   readonly value = input<number | null>(null);
-  readonly delay = input<number>(0);
+  readonly spinning = input<boolean>(false);
   readonly variant = input<'main' | 'bonus'>('main');
 }
