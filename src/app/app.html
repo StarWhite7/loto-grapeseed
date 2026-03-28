@@ -1,0 +1,57 @@
+<main class="page-shell">
+  <section class="ticket">
+    <header class="ticket__header">
+      <p class="ticket__kicker">Recolte annuelle du domaine</p>
+      <h1 class="ticket__title">Grapeseed Loterie</h1>
+      <p class="ticket__subtitle">Choisissez vos numeros</p>
+    </header>
+
+    <section class="ticket__panel">
+      <div class="ticket__panel-head">
+        <div>
+          <p class="ticket__panel-kicker">Tirage principal</p>
+          <h2>Deux numeros uniques</h2>
+        </div>
+        <p class="ticket__panel-copy">De 1 a 10, gravures sur bois du marche fermier.</p>
+      </div>
+
+      <div class="ticket__main-grid">
+        @for (ball of mainBalls(); track ball.id) {
+          <app-ball
+            [label]="ball.label"
+            [value]="ball.value"
+            [delay]="ball.delay"
+          />
+        }
+      </div>
+    </section>
+
+    <section class="ticket__panel ticket__panel--bonus">
+      <div class="ticket__panel-head">
+        <div>
+          <p class="ticket__panel-kicker">Prime de la ferme</p>
+          <h2>Numero chance</h2>
+        </div>
+        <p class="ticket__panel-copy">Une pastille doree qui tranche avec les numeros principaux.</p>
+      </div>
+
+      <div class="ticket__bonus-wrap">
+        @for (ball of [bonusBall()]; track ball.id) {
+          <app-ball
+            [label]="ball.label"
+            [value]="ball.value"
+            [delay]="ball.delay"
+            variant="bonus"
+          />
+        }
+      </div>
+    </section>
+
+    <footer class="ticket__footer">
+      <button class="ticket__button" type="button" (click)="drawNumbers()">
+        Tirer les numeros
+      </button>
+      <p class="ticket__note">2 numeros principaux uniques, 1 numero chance distinct.</p>
+    </footer>
+  </section>
+</main>

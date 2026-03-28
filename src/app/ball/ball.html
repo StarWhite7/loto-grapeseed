@@ -1,0 +1,14 @@
+<article
+  class="ticket-slot"
+  [class.ticket-slot--bonus]="variant() === 'bonus'"
+>
+  <p class="ticket-slot__label">{{ label() }}</p>
+  <div
+    class="ticket-slot__token"
+    [class.ticket-slot__token--bonus]="variant() === 'bonus'"
+    [style.animation-delay.ms]="delay()"
+  >
+    <span class="ticket-slot__ring"></span>
+    <span class="ticket-slot__value">{{ value() ?? '?' }}</span>
+  </div>
+</article>
